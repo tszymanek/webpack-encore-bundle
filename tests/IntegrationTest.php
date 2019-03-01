@@ -2,6 +2,8 @@
 
 namespace Symfony\WebpackEncoreBundle\Tests;
 
+use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupCollectionInterface;
+use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
 use Symfony\WebpackEncoreBundle\WebpackEncoreBundle;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -77,6 +79,14 @@ class IntegrationTest extends TestCase
             $html2
         );
     }
+
+    public function testAutowireableInterfaces()
+    {
+        $kernel = new WebpackEncoreIntegrationTestKernel(true);
+        $kernel->boot();
+        $container = $kernel->getContainer();
+        $this->assertInstanceOf(WebpackEncoreAutowireTestService::class, $container->get(WebpackEncoreAutowireTestService::class));
+    }
 }
 
 class WebpackEncoreIntegrationTestKernel extends Kernel
@@ -122,6 +132,9 @@ class WebpackEncoreIntegrationTestKernel extends Kernel
                     'different_build' =>  __DIR__.'/fixtures/different_build'
                 ]
             ]);
+
+            $container->autowire(WebpackEncoreAutowireTestService::class)
+                ->setPublic(true);
         });
     }
 
@@ -133,5 +146,13 @@ class WebpackEncoreIntegrationTestKernel extends Kernel
     public function getLogDir()
     {
         return sys_get_temp_dir().'/logs'.spl_object_hash($this);
+    }
+}
+
+class WebpackEncoreAutowireTestService
+{
+    public function __construct(EntrypointLookupInterface $entrypointLookup, EntrypointLookupCollectionInterface $entrypointLookupCollection)
+    {
+
     }
 }
