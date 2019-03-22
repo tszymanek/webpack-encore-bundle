@@ -19,7 +19,12 @@ class EntrypointCacheWarmer extends AbstractPhpFileCacheWarmer
 {
     private $cacheKeys;
 
-    public function __construct(array $cacheKeys, string $phpArrayFile, CacheItemPoolInterface $fallbackPool)
+    /**
+     * @param array                  $cacheKeys
+     * @param string                 $phpArrayFile
+     * @param CacheItemPoolInterface $fallbackPool
+     */
+    public function __construct(array $cacheKeys, $phpArrayFile, CacheItemPoolInterface $fallbackPool)
     {
         $this->cacheKeys = $cacheKeys;
         parent::__construct($phpArrayFile, $fallbackPool);

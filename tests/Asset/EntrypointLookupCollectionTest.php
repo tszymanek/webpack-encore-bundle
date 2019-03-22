@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 class EntrypointLookupCollectionTest extends TestCase
 {
     /**
-     * @expectedException Symfony\WebpackEncoreBundle\Exception\UndefinedBuildException
+     * @expectedException \Symfony\WebpackEncoreBundle\Exception\UndefinedBuildException
      * @expectedExceptionMessage Given entry point "something" is not configured
      */
     public function testExceptionOnMissingEntry()

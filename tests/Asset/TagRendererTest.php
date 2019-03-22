@@ -29,8 +29,8 @@ class TagRendererTest extends TestCase
                 ['/build/file1.js', 'custom_package'],
                 ['/build/file2.js', 'custom_package']
             )
-            ->willReturnCallback(function($path) {
-                return 'http://localhost:8080'.$path;
+            ->willReturnCallback(function ($path) {
+                return 'http://localhost:8080' . $path;
             });
         $renderer = new TagRenderer($entrypointCollection, $packages);
 
@@ -60,8 +60,8 @@ class TagRendererTest extends TestCase
         $packages = $this->createMock(Packages::class);
         $packages->expects($this->once())
             ->method('getUrl')
-            ->willReturnCallback(function($path) {
-                return 'http://localhost:8080'.$path;
+            ->willReturnCallback(function ($path) {
+                return 'http://localhost:8080' . $path;
             });
         $renderer = new TagRenderer($entrypointCollection, $packages);
 
@@ -106,8 +106,8 @@ class TagRendererTest extends TestCase
                 ['/build/file2.js', null],
                 ['/build/file3.js', 'specific_package']
             )
-            ->willReturnCallback(function($path) {
-                return 'http://localhost:8080'.$path;
+            ->willReturnCallback(function ($path) {
+                return 'http://localhost:8080' . $path;
             });
         $renderer = new TagRenderer($entrypointCollection, $packages);
 

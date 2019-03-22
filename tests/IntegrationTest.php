@@ -26,7 +26,7 @@ class IntegrationTest extends TestCase
             $html1
         );
         $this->assertContains(
-            '<link rel="stylesheet" href="/build/styles.css">'.
+            '<link rel="stylesheet" href="/build/styles.css">' .
             '<link rel="stylesheet" href="/build/styles2.css">',
             $html1
         );
@@ -35,7 +35,7 @@ class IntegrationTest extends TestCase
             $html1
         );
         $this->assertContains(
-            '<link rel="stylesheet" href="/build/styles3.css">'.
+            '<link rel="stylesheet" href="/build/styles3.css">' .
             '<link rel="stylesheet" href="/build/styles4.css">',
             $html1
         );
@@ -90,11 +90,32 @@ class IntegrationTest extends TestCase
 
         $cacheWarmer->warmCache($kernel->getCacheDir());
 
-        $cachePath = $kernel->getCacheDir().'/webpack_encore.cache.php';
+        $cachePath = $kernel->getCacheDir() . '/webpack_encore.cache.php';
         $this->assertFileExists($cachePath);
         $data = require $cachePath;
+
         // check for both build keys
-        $this->assertEquals(['_default' => 0, 'different_build' => 1], $data[0]);
+        if ($this->dataHasIntegerKeys($data)) {
+            $this->assertEquals(['_default' => 0, 'different_build' => 1], $data[0]);
+        } else {
+            $this->assertArrayHasKey('_default', $data);
+            $this->assertArrayHasKey('different_build', $data);
+        }
+    }
+
+    /** @param array $data
+     *
+     * @return bool
+     */
+    protected function dataHasIntegerKeys(array $data)
+    {
+        foreach ($data as $key => $value) {
+            if (!is_int($key)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 
@@ -119,7 +140,7 @@ class WebpackEncoreIntegrationTestKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load(function(ContainerBuilder $container) {
+        $loader->load(function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
                 'secret' => 'foo',
                 'assets' => [
@@ -129,16 +150,16 @@ class WebpackEncoreIntegrationTestKernel extends Kernel
 
             $container->loadFromExtension('twig', [
                 'paths' => [
-                    __DIR__.'/fixtures' => 'integration_test'
+                    __DIR__ . '/fixtures' => 'integration_test'
                 ],
                 'strict_variables' => true,
             ]);
 
             $container->loadFromExtension('webpack_encore', [
-                'output_path' => __DIR__.'/fixtures/build',
+                'output_path' => __DIR__ . '/fixtures/build',
                 'cache' => true,
                 'builds' => [
-                    'different_build' =>  __DIR__.'/fixtures/different_build'
+                    'different_build' =>  __DIR__ . '/fixtures/different_build'
                 ]
             ]);
 
@@ -150,12 +171,12 @@ class WebpackEncoreIntegrationTestKernel extends Kernel
 
     public function getCacheDir()
     {
-        return sys_get_temp_dir().'/cache'.spl_object_hash($this);
+        return sys_get_temp_dir() . '/cache' . spl_object_hash($this);
     }
 
     public function getLogDir()
     {
-        return sys_get_temp_dir().'/logs'.spl_object_hash($this);
+        return sys_get_temp_dir() . '/logs' . spl_object_hash($this);
     }
 }
 
@@ -168,7 +189,8 @@ class WebpackEncoreCacheWarmerTester
         $this->entrypointCacheWarmer = $entrypointCacheWarmer;
     }
 
-    public function warmCache(string $cacheDir)
+    /** @param string $cacheDir */
+    public function warmCache($cacheDir)
     {
         $this->entrypointCacheWarmer->warmUp($cacheDir);
     }

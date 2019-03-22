@@ -18,12 +18,16 @@ final class TagRenderer
 
     private $packages;
 
-    public function __construct(
-        $entrypointLookupCollection,
-        Packages $packages
-    ) {
+    public function __construct($entrypointLookupCollection, Packages $packages)
+    {
         if ($entrypointLookupCollection instanceof EntrypointLookupInterface) {
-            @trigger_error(sprintf('The "$entrypointLookupCollection" argument in method "%s()" must be an instance of EntrypointLookupCollection.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(
+                sprintf(
+                    'The "$entrypointLookupCollection" argument in method "%s()" must be an instance of EntrypointLookupCollection.',
+                    __METHOD__
+                ),
+                E_USER_DEPRECATED
+            );
 
             $this->entrypointLookupCollection = new EntrypointLookupCollection(
                 new ServiceLocator(['_default' => function () use ($entrypointLookupCollection) {
@@ -33,13 +37,22 @@ final class TagRenderer
         } elseif ($entrypointLookupCollection instanceof EntrypointLookupCollection) {
             $this->entrypointLookupCollection = $entrypointLookupCollection;
         } else {
-            throw new \TypeError('The "$entrypointLookupCollection" argument must be an instance of EntrypointLookupCollection.');
+            throw new \TypeError(
+                'The "$entrypointLookupCollection" argument must be an instance of EntrypointLookupCollection.'
+            );
         }
 
         $this->packages = $packages;
     }
 
-    public function renderWebpackScriptTags(string $entryName, string $packageName = null, string $entrypointName = '_default'): string
+    /**
+     * @param string      $entryName
+     * @param string|null $packageName
+     * @param string      $entrypointName
+     *
+     * @return string
+     */
+    public function renderWebpackScriptTags($entryName, $packageName = null, $entrypointName = '_default')
     {
         $scriptTags = [];
         foreach ($this->getEntrypointLookup($entrypointName)->getJavaScriptFiles($entryName) as $filename) {
@@ -52,7 +65,14 @@ final class TagRenderer
         return implode('', $scriptTags);
     }
 
-    public function renderWebpackLinkTags(string $entryName, string $packageName = null, string $entrypointName = '_default'): string
+    /**
+     * @param string      $entryName
+     * @param string|null $packageName
+     * @param string      $entrypointName
+     *
+     * @return string
+     */
+    public function renderWebpackLinkTags($entryName, $packageName = null, $entrypointName = '_default')
     {
         $scriptTags = [];
         foreach ($this->getEntrypointLookup($entrypointName)->getCssFiles($entryName) as $filename) {
@@ -65,7 +85,13 @@ final class TagRenderer
         return implode('', $scriptTags);
     }
 
-    private function getAssetPath(string $assetPath, string $packageName = null): string
+    /**
+     * @param string      $assetPath
+     * @param string|null $packageName
+     *
+     * @return string
+     */
+    private function getAssetPath($assetPath, $packageName = null)
     {
         if (null === $this->packages) {
             throw new \Exception('To render the script or link tags, run "composer require symfony/asset".');
@@ -77,7 +103,12 @@ final class TagRenderer
         );
     }
 
-    private function getEntrypointLookup(string $buildName): EntrypointLookupInterface
+    /**
+     * @param string $buildName
+     *
+     * @return EntrypointLookupInterface
+     */
+    private function getEntrypointLookup($buildName)
     {
         return $this->entrypointLookupCollection->getEntrypointLookup($buildName);
     }

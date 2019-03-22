@@ -9,20 +9,28 @@
 
 namespace Symfony\WebpackEncoreBundle\Asset;
 
-use Symfony\Contracts\Service\ResetInterface;
 use Symfony\WebpackEncoreBundle\Exception\EntrypointNotFoundException;
+use Symfony\WebpackEncoreBundle\Service\ResetInterface;
 
 interface EntrypointLookupInterface extends ResetInterface
 {
     /**
+     * @param string $entryName
+     *
      * @throws EntrypointNotFoundException if an entry name is passed that does not exist in entrypoints.json
+     *
+     * @return array
      */
-    public function getJavaScriptFiles(string $entryName): array;
+    public function getJavaScriptFiles($entryName);
 
     /**
+     * @param string $entryName
+     *
      * @throws EntrypointNotFoundException if an entry name is passed that does not exist in entrypoints.json
+     *
+     * @return array
      */
-    public function getCssFiles(string $entryName): array;
+    public function getCssFiles($entryName);
 
     /**
      * Resets the state of this service.

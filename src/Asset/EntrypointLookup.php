@@ -29,19 +29,32 @@ class EntrypointLookup implements EntrypointLookupInterface
 
     private $cache;
 
-    public function __construct(string $entrypointJsonPath, CacheItemPoolInterface $cache = null, string $cacheKey = null)
+    private $cacheKey;
+
+    /**
+     * @param string                      $entrypointJsonPath
+     * @param CacheItemPoolInterface|null $cache
+     * @param string|null                 $cacheKey
+     */
+    public function __construct($entrypointJsonPath, CacheItemPoolInterface $cache = null, $cacheKey = null)
     {
         $this->entrypointJsonPath = $entrypointJsonPath;
         $this->cache = $cache;
         $this->cacheKey = $cacheKey;
     }
 
-    public function getJavaScriptFiles(string $entryName): array
+    /**
+     * {@inheritdoc}
+     */
+    public function getJavaScriptFiles($entryName)
     {
         return $this->getEntryFiles($entryName, 'js');
     }
 
-    public function getCssFiles(string $entryName): array
+    /**
+     * {@inheritdoc}
+     */
+    public function getCssFiles($entryName)
     {
         return $this->getEntryFiles($entryName, 'css');
     }
@@ -54,7 +67,13 @@ class EntrypointLookup implements EntrypointLookupInterface
         $this->returnedFiles = [];
     }
 
-    private function getEntryFiles(string $entryName, string $key): array
+    /**
+     * @param string $entryName
+     * @param string $key
+     *
+     * @return array
+     */
+    private function getEntryFiles($entryName, $key)
     {
         $this->validateEntryName($entryName);
         $entriesData = $this->getEntriesData();
@@ -73,21 +92,36 @@ class EntrypointLookup implements EntrypointLookupInterface
         return $newFiles;
     }
 
-    private function validateEntryName(string $entryName)
+    /** @param string $entryName */
+    private function validateEntryName($entryName)
     {
         $entriesData = $this->getEntriesData();
         if (!isset($entriesData['entrypoints'][$entryName])) {
             $withoutExtension = substr($entryName, 0, strrpos($entryName, '.'));
 
             if (isset($entriesData['entrypoints'][$withoutExtension])) {
-                throw new EntrypointNotFoundException(sprintf('Could not find the entry "%s". Try "%s" instead (without the extension).', $entryName, $withoutExtension));
+                throw new EntrypointNotFoundException(
+                    sprintf(
+                        'Could not find the entry "%s". Try "%s" instead (without the extension).',
+                        $entryName,
+                        $withoutExtension
+                    )
+                );
             }
 
-            throw new EntrypointNotFoundException(sprintf('Could not find the entry "%s" in "%s". Found: %s.', $entryName, $this->entrypointJsonPath, implode(', ', array_keys($entriesData))));
+            throw new EntrypointNotFoundException(
+                sprintf(
+                    'Could not find the entry "%s" in "%s". Found: %s.',
+                    $entryName,
+                    $this->entrypointJsonPath,
+                    implode(', ', array_keys($entriesData))
+                )
+            );
         }
     }
 
-    private function getEntriesData(): array
+    /** @return array */
+    private function getEntriesData()
     {
         if (null !== $this->entriesData) {
             return $this->entriesData;
@@ -102,17 +136,26 @@ class EntrypointLookup implements EntrypointLookupInterface
         }
 
         if (!file_exists($this->entrypointJsonPath)) {
-            throw new \InvalidArgumentException(sprintf('Could not find the entrypoints file from Webpack: the file "%s" does not exist.', $this->entrypointJsonPath));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Could not find the entrypoints file from Webpack: the file "%s" does not exist.',
+                    $this->entrypointJsonPath
+                )
+            );
         }
 
         $this->entriesData = json_decode(file_get_contents($this->entrypointJsonPath), true);
 
         if (null === $this->entriesData) {
-            throw new \InvalidArgumentException(sprintf('There was a problem JSON decoding the "%s" file', $this->entrypointJsonPath));
+            throw new \InvalidArgumentException(
+                sprintf('There was a problem JSON decoding the "%s" file', $this->entrypointJsonPath)
+            );
         }
 
         if (!isset($this->entriesData['entrypoints'])) {
-            throw new \InvalidArgumentException(sprintf('Could not find an "entrypoints" key in the "%s" file', $this->entrypointJsonPath));
+            throw new \InvalidArgumentException(
+                sprintf('Could not find an "entrypoints" key in the "%s" file', $this->entrypointJsonPath)
+            );
         }
 
         if ($this->cache) {

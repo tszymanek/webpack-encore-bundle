@@ -34,37 +34,73 @@ final class EntryFilesTwigExtension extends AbstractExtension
         ];
     }
 
-    public function getWebpackJsFiles(string $entryName, string $entrypointName = '_default'): array
+    /**
+     * @param string $entryName
+     * @param string $entrypointName
+     *
+     * @return array
+     */
+    public function getWebpackJsFiles($entryName, $entrypointName = '_default')
     {
         return $this->getEntrypointLookup($entrypointName)
             ->getJavaScriptFiles($entryName);
     }
 
-    public function getWebpackCssFiles(string $entryName, string $entrypointName = '_default'): array
+    /**
+     * @param string $entryName
+     * @param string $entrypointName
+     *
+     * @return array
+     */
+    public function getWebpackCssFiles($entryName, $entrypointName = '_default')
     {
         return $this->getEntrypointLookup($entrypointName)
             ->getCssFiles($entryName);
     }
 
-    public function renderWebpackScriptTags(string $entryName, string $packageName = null, string $entrypointName = '_default'): string
+    /**
+     * @param string      $entryName
+     * @param string|null $packageName
+     * @param string      $entrypointName
+     *
+     * @throws \Exception
+     *
+     * @return string
+     */
+    public function renderWebpackScriptTags($entryName, $packageName = null, $entrypointName = '_default')
     {
         return $this->getTagRenderer()
             ->renderWebpackScriptTags($entryName, $packageName, $entrypointName);
     }
 
-    public function renderWebpackLinkTags(string $entryName, string $packageName = null, string $entrypointName = '_default'): string
+    /**
+     * @param string      $entryName
+     * @param string|null $packageName
+     * @param string      $entrypointName
+     *
+     * @throws \Exception
+     *
+     * @return string
+     */
+    public function renderWebpackLinkTags($entryName, $packageName = null, $entrypointName = '_default')
     {
         return $this->getTagRenderer()
             ->renderWebpackLinkTags($entryName, $packageName, $entrypointName);
     }
 
-    private function getEntrypointLookup(string $entrypointName): EntrypointLookupInterface
+    /**
+     * @param string $entrypointName
+     *
+     * @return EntrypointLookupInterface
+     */
+    private function getEntrypointLookup($entrypointName)
     {
         return $this->container->get('webpack_encore.entrypoint_lookup_collection')
             ->getEntrypointLookup($entrypointName);
     }
 
-    private function getTagRenderer(): TagRenderer
+    /** @return TagRenderer */
+    private function getTagRenderer()
     {
         return $this->container->get('webpack_encore.tag_renderer');
     }

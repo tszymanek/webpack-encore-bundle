@@ -13,6 +13,8 @@ env:
 matrix:
     fast_finish: true
     include:
+        - php: 5.6
+          env: SYMFONY_PHPUNIT_VERSION=5.7
         - php: 7.1
           env: SYMFONY_PHPUNIT_VERSION=7.4
         - php: 7.1
@@ -37,7 +39,7 @@ install:
       if [[ $deps = low ]]; then
           export SYMFONY_REQUIRE='>=2.3'
       fi
-      composer global require --no-progress --no-scripts --no-plugins symfony/flex dev-master
+      # composer global require --no-progress --no-scripts --no-plugins symfony/flex dev-master
     - ./vendor/bin/simple-phpunit install
 
 script:

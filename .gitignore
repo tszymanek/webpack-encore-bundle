@@ -2,3 +2,5 @@ composer.lock
 phpunit.xml
 vendor/
 .php_cs.cache
+.idea
+/composer.phar
