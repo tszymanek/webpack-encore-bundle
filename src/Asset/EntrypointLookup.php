@@ -19,7 +19,7 @@ use Symfony\WebpackEncoreBundle\Exception\EntrypointNotFoundException;
  *
  * @final
  */
-class EntrypointLookup implements EntrypointLookupInterface
+class EntrypointLookup implements EntrypointLookupInterface, IntegrityDataProviderInterface
 {
     private $entrypointJsonPath;
 
@@ -57,6 +57,20 @@ class EntrypointLookup implements EntrypointLookupInterface
     public function getCssFiles($entryName)
     {
         return $this->getEntryFiles($entryName, 'css');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getIntegrityData()
+    {
+        $entriesData = $this->getEntriesData();
+
+        if (!array_key_exists('integrity', $entriesData)) {
+            return [];
+        }
+
+        return $entriesData['integrity'];
     }
 
     /**

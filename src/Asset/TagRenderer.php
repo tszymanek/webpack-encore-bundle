@@ -55,10 +55,21 @@ final class TagRenderer
     public function renderWebpackScriptTags($entryName, $packageName = null, $entrypointName = '_default')
     {
         $scriptTags = [];
-        foreach ($this->getEntrypointLookup($entrypointName)->getJavaScriptFiles($entryName) as $filename) {
+        $entryPointLookup = $this->getEntrypointLookup($entrypointName);
+        $integrityHashes = ($entryPointLookup instanceof IntegrityDataProviderInterface) ? $entryPointLookup->getIntegrityData() : [];
+
+        foreach ($entryPointLookup->getJavaScriptFiles($entryName) as $filename) {
+            $attributes = [
+                'src' => $this->getAssetPath($filename, $packageName),
+            ];
+
+            if (isset($integrityHashes[$filename])) {
+                $attributes['integrity'] = $integrityHashes[$filename];
+            }
+
             $scriptTags[] = sprintf(
-                '<script src="%s"></script>',
-                htmlentities($this->getAssetPath($filename, $packageName))
+                '<script %s></script>',
+                $this->convertArrayToAttributes($attributes)
             );
         }
 
@@ -75,10 +86,22 @@ final class TagRenderer
     public function renderWebpackLinkTags($entryName, $packageName = null, $entrypointName = '_default')
     {
         $scriptTags = [];
-        foreach ($this->getEntrypointLookup($entrypointName)->getCssFiles($entryName) as $filename) {
+        $entryPointLookup = $this->getEntrypointLookup($entrypointName);
+        $integrityHashes = ($entryPointLookup instanceof IntegrityDataProviderInterface) ? $entryPointLookup->getIntegrityData() : [];
+
+        foreach ($entryPointLookup->getCssFiles($entryName) as $filename) {
+            $attributes = [
+                'rel' => 'stylesheet',
+                'href' => $this->getAssetPath($filename, $packageName),
+            ];
+
+            if (isset($integrityHashes[$filename])) {
+                $attributes['integrity'] = $integrityHashes[$filename];
+            }
+
             $scriptTags[] = sprintf(
-                '<link rel="stylesheet" href="%s">',
-                htmlentities($this->getAssetPath($filename, $packageName))
+                '<link %s>',
+                $this->convertArrayToAttributes($attributes)
             );
         }
 
@@ -111,5 +134,21 @@ final class TagRenderer
     private function getEntrypointLookup($buildName)
     {
         return $this->entrypointLookupCollection->getEntrypointLookup($buildName);
+    }
+
+    /**
+     * @param array $attributesMap
+     *
+     * @return string
+     */
+    private function convertArrayToAttributes(array $attributesMap)
+    {
+        return implode(' ', array_map(
+            function ($key, $value) {
+                return sprintf('%s="%s"', $key, htmlentities($value));
+            },
+            array_keys($attributesMap),
+            $attributesMap
+        ));
     }
 }
